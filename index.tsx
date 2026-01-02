@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 
-// Pastikan root element tersedia
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  console.error("FATAL: Root element not found");
-} else {
+  throw new Error("Root element not found");
+}
+
+const renderApp = () => {
   try {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -16,16 +17,19 @@ if (!rootElement) {
       </React.StrictMode>
     );
     
-    // Sembunyikan loading menggunakan pengecekan aman pada objek window
+    // Memberikan sinyal ke index.html bahwa aplikasi sudah siap
     const win = window as any;
     if (typeof win.hideLoading === 'function') {
-      // Beri jeda sedikit agar render awal selesai
-      setTimeout(() => win.hideLoading(), 100);
+      // Jeda 200ms untuk memastikan cat pertama (first paint) selesai
+      setTimeout(win.hideLoading, 200);
     }
   } catch (err: any) {
-    console.error("React Mounting Error:", err);
+    console.error("Render Error:", err);
     if (window.onerror) {
-      window.onerror(err.message || "Gagal merender aplikasi", "index.tsx", 0, 0, err);
+      window.onerror(err.message || "Gagal inisialisasi React", "index.tsx", 0, 0, err);
     }
   }
-}
+};
+
+// Jalankan render
+renderApp();

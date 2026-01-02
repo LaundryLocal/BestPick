@@ -3,15 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BestPick - Kurasi Produk Shopee Terlaris</title>
+    <title>BestPick - Kurasi Produk Shopee</title>
     
     <!-- Tailwind & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Babel Standalone (Penting untuk menjalankan TSX di browser) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <script>
       tailwind.config = {
         theme: {
@@ -24,24 +21,25 @@
     </script>
 
     <style>
-      body { background-color: #ffffff; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+      body { background-color: #ffffff; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
       #loading-screen {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; background: white; z-index: 9999;
-        transition: opacity 0.5s ease;
       }
       .spinner {
-        width: 40px; height: 40px; border: 4px solid #f3f3f3;
-        border-top: 4px solid #EE4D2D; border-radius: 50%; animation: spin 1s linear infinite;
+        width: 32px; height: 32px; border: 3px solid #f3f3f3;
+        border-top: 3px solid #EE4D2D; border-radius: 50%; animation: spin 0.8s linear infinite;
       }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+      
       #error-display {
         display: none; position: fixed; inset: 0; background: #fff1f2;
-        color: #be123c; padding: 20px; z-index: 10000; overflow: auto; font-family: monospace;
+        color: #be123c; padding: 24px; z-index: 10000; overflow: auto;
       }
-      .fade-out { opacity: 0; pointer-events: none; }
     </style>
 
+    <!-- Unified Importmap: Prevents multiple React instances which cause "useState" errors -->
     <script type="importmap">
 {
   "imports": {
@@ -59,60 +57,48 @@
     <!-- Layar Loading -->
     <div id="loading-screen">
       <div class="spinner"></div>
-      <p style="margin-top: 15px; font-weight: 800; color: #1e293b; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Menyiapkan Katalog...</p>
-      <button id="fail-safe-btn" onclick="location.reload()" style="display: none; margin-top: 20px; font-size: 10px; color: #EE4D2D; text-decoration: underline;">Muat Ulang Halaman</button>
+      <p style="margin-top: 16px; font-weight: 700; color: #64748b; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Menyiapkan Katalog...</p>
     </div>
 
     <!-- Tampilan Error -->
     <div id="error-display">
-      <h2 style="font-weight: bold;">Oops! Aplikasi Gagal Dimuat</h2>
-      <p>Ini biasanya terjadi karena masalah koneksi atau file tidak ditemukan.</p>
-      <pre id="error-content" style="background: #fee2e2; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 12px;"></pre>
-      <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">Coba Lagi</button>
+      <h2 style="font-weight: 800; font-size: 20px; margin-bottom: 8px;">Gagal Memuat Aplikasi</h2>
+      <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8;">Terjadi kesalahan saat menginisialisasi modul belanja.</p>
+      <pre id="error-content" style="background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 12px; font-family: monospace; white-space: pre-wrap;"></pre>
+      <button onclick="location.reload()" style="margin-top: 24px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Muat Ulang Halaman</button>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Fungsi untuk menyembunyikan loading screen
+      // Fungsi global untuk kontrol loading
       window.hideLoading = function() {
         const ls = document.getElementById('loading-screen');
-        if (ls) {
-          ls.classList.add('fade-out');
-          setTimeout(() => {
-            ls.style.display = 'none';
-          }, 500);
-        }
+        if (ls) ls.classList.add('fade-out');
       };
 
-      // Fail-safe: Jika dalam 10 detik tidak masuk ke App, tampilkan tombol muat ulang
-      setTimeout(() => {
-        const ls = document.getElementById('loading-screen');
-        if (ls && ls.style.display !== 'none') {
-          const btn = document.getElementById('fail-safe-btn');
-          if (btn) btn.style.display = 'block';
-        }
-      }, 10000);
-
-      // Logging error global yang lebih detail
+      // Logging error global
       window.onerror = function(msg, url, line, col, error) {
-        // Abaikan error remeh dari ekstensi browser
-        if (msg.includes("ResizeObserver") || msg.includes("Extension")) return;
-        
-        console.error("Global Error Detail:", {msg, url, line, col, error});
+        if (msg.includes("ResizeObserver")) return; 
         
         const display = document.getElementById('error-display');
         const content = document.getElementById('error-content');
         if (display && content) {
           display.style.display = 'block';
-          content.textContent = `Error: ${msg}\nFile: ${url || 'internal/esm'}\nLine: ${line || '?'}`;
+          content.textContent = `Pesan: ${msg}\nSumber: ${url || 'Module ESM'}\nBaris: ${line || '?'}`;
         }
         window.hideLoading();
         return false;
       };
-    </script>
 
-    <!-- Menggunakan index.tsx sebagai entry point tunggal melalui Babel -->
-    <script type="text/babel" data-type="module" src="./index.tsx" crossorigin></script>
+      // Safety timeout for loading screen
+      setTimeout(() => {
+        const ls = document.getElementById('loading-screen');
+        if (ls && !ls.classList.contains('fade-out')) {
+          console.warn("Loading timeout - triggering manual hide");
+          window.hideLoading();
+        }
+      }, 8000);
+    </script>
   </body>
 </html>
