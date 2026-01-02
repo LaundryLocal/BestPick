@@ -21,7 +21,7 @@
     </script>
 
     <style>
-      body { background-color: #ffffff; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+      body { background-color: #ffffff; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
       #loading-screen {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; background: white; z-index: 9999;
@@ -39,7 +39,7 @@
       }
     </style>
 
-    <!-- Unified Importmap: Prevents multiple React instances which cause "useState" errors -->
+    <!-- Strict Importmap: Memastikan HANYA SATU instance React yang dimuat -->
     <script type="importmap">
 {
   "imports": {
@@ -71,15 +71,16 @@
     <div id="root"></div>
 
     <script>
-      // Fungsi global untuk kontrol loading
+      // Fungsi global untuk menyembunyikan loading
       window.hideLoading = function() {
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('fade-out');
       };
 
-      // Logging error global
+      // Pelaporan error yang lebih baik
       window.onerror = function(msg, url, line, col, error) {
         if (msg.includes("ResizeObserver")) return; 
+        console.error("Caught Error:", msg, url, line);
         
         const display = document.getElementById('error-display');
         const content = document.getElementById('error-content');
@@ -91,14 +92,14 @@
         return false;
       };
 
-      // Safety timeout for loading screen
+      // Auto-hide loading jika aplikasi gagal memberi sinyal (safety net)
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
         if (ls && !ls.classList.contains('fade-out')) {
-          console.warn("Loading timeout - triggering manual hide");
+          console.warn("Loading timeout - hiding screen");
           window.hideLoading();
         }
-      }, 8000);
+      }, 5000);
     </script>
   </body>
 </html>
