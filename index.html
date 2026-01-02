@@ -79,25 +79,33 @@
         const ls = document.getElementById('loading-screen');
         if (ls) {
           ls.classList.add('fade-out');
-          setTimeout(() => ls.style.display = 'none', 500);
+          setTimeout(() => {
+            ls.style.display = 'none';
+          }, 500);
         }
       };
 
-      // Fail-safe: Jika dalam 8 detik tidak masuk ke App, tampilkan tombol muat ulang
+      // Fail-safe: Jika dalam 10 detik tidak masuk ke App, tampilkan tombol muat ulang
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
         if (ls && ls.style.display !== 'none') {
-          document.getElementById('fail-safe-btn').style.display = 'block';
+          const btn = document.getElementById('fail-safe-btn');
+          if (btn) btn.style.display = 'block';
         }
-      }, 8000);
+      }, 10000);
 
-      // Logging error global
+      // Logging error global yang lebih detail
       window.onerror = function(msg, url, line, col, error) {
-        console.error("Global Error:", msg, "at", url, ":", line);
+        // Abaikan error remeh dari ekstensi browser
+        if (msg.includes("ResizeObserver") || msg.includes("Extension")) return;
+        
+        console.error("Global Error Detail:", {msg, url, line, col, error});
+        
         const display = document.getElementById('error-display');
-        if (display) {
+        const content = document.getElementById('error-content');
+        if (display && content) {
           display.style.display = 'block';
-          document.getElementById('error-content').textContent = `${msg}\nFile: ${url}\nLine: ${line}`;
+          content.textContent = `Error: ${msg}\nFile: ${url || 'internal/esm'}\nLine: ${line || '?'}`;
         }
         window.hideLoading();
         return false;
@@ -105,6 +113,6 @@
     </script>
 
     <!-- Menggunakan index.tsx sebagai entry point tunggal melalui Babel -->
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
+    <script type="text/babel" data-type="module" src="./index.tsx" crossorigin></script>
   </body>
 </html>
