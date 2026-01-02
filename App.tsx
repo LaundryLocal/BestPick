@@ -20,9 +20,9 @@ import {
   Info,
   Star
 } from 'lucide-react';
-import { getAllAssets } from './services/db';
-import { ImageManager } from './components/ImageManager';
-import { StoredAsset, DEFAULT_SHOPEE_LINK } from './types';
+import { getAllAssets } from './services/db.ts';
+import { ImageManager } from './components/ImageManager.tsx';
+import { StoredAsset, DEFAULT_SHOPEE_LINK } from './types.ts';
 
 function App() {
   const [storedAssets, setStoredAssets] = useState<StoredAsset[]>([]);
@@ -55,7 +55,7 @@ function App() {
   const handleLogoClick = () => {
     setLogoClicks(prev => {
       const newCount = prev + 1;
-      if (newCount >= 10) { // Butuh 10 klik untuk keamanan
+      if (newCount >= 10) {
         setShowAdmin(true);
         return 0;
       }
@@ -95,7 +95,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL DETAIL PRODUK - LENGKAP */}
+      {/* MODAL DETAIL PRODUK */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[120] bg-slate-900/70 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setSelectedProduct(null)}>
           <div className="bg-white w-full max-w-5xl h-[92vh] md:h-auto md:max-h-[90vh] rounded-t-[2rem] md:rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl animate-in slide-in-from-bottom duration-500" onClick={e => e.stopPropagation()}>
