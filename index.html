@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Goldent Official - Partner Berkendara Saat Hujan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+            },
+            colors: {
+              shopee: '#EE4D2D',
+              goldent: {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+                600: '#ea580c',
+                900: '#0f172a',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root {
+        scroll-behavior: smooth;
+      }
+      body {
+        -webkit-font-smoothing: antialiased;
+        background-color: #ffffff;
+        color: #0f172a;
+        overflow-x: hidden;
+        word-break: break-word;
+      }
+      /* Clean Scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f8fafc;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .safe-top {
+        padding-top: env(safe-area-inset-top);
+      }
+      @media (max-width: 640px) {
+        .mobile-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+          padding: 0 16px;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
