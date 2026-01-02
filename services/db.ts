@@ -1,8 +1,16 @@
-import { StoredAsset, DEFAULT_SHOPEE_LINK } from '../types';
+import { StoredAsset, DEFAULT_SHOPEE_LINK } from '../types.ts';
 
 const DB_NAME = 'GoldentAffiliateDB';
 const STORE_NAME = 'assets';
-const DB_VERSION = 3; // Bump version for schema change
+const DB_VERSION = 3;
+
+// Fallback untuk random ID jika crypto.randomUUID tidak tersedia
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
 
 export const initDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
@@ -37,7 +45,7 @@ export const saveAsset = async (file: File): Promise<StoredAsset> => {
         const type = file.type.startsWith('video/') ? 'video' : 'image';
 
         const newAsset: StoredAsset = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           dataUrl: reader.result as string,
           name: "Produk Baru", 
           price: "89000",
