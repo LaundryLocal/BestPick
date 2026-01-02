@@ -4,7 +4,13 @@ import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
 
-if (rootElement) {
+if (!rootElement) {
+  const errorMsg = "Elemen #root tidak ditemukan di HTML.";
+  console.error(errorMsg);
+  if ((window as any).onerror) {
+    (window as any).onerror(errorMsg, "index.tsx", 0);
+  }
+} else {
   try {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -13,20 +19,18 @@ if (rootElement) {
       </React.StrictMode>
     );
 
-    // Give the browser a moment to paint the UI before hiding loader
-    const win = window as any;
-    if (typeof win.hideLoading === 'function') {
-      setTimeout(() => {
+    // Memberi tahu browser bahwa inisialisasi berhasil
+    setTimeout(() => {
+      const win = window as any;
+      if (typeof win.hideLoading === 'function') {
         win.hideLoading();
-      }, 300);
-    }
+      }
+    }, 500);
+    
   } catch (err: any) {
     console.error("Mounting Error:", err);
-    // Explicitly trigger the global error handler if mounting fails
-    if (window.onerror) {
-      window.onerror(err.message || "React fail", "index.tsx", 0, 0, err);
+    if ((window as any).onerror) {
+      (window as any).onerror(err.message || "Gagal memuat React", "index.tsx", 0);
     }
   }
-} else {
-  console.error("Root element #root not found in HTML");
 }

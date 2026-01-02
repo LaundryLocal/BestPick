@@ -39,7 +39,7 @@
       }
     </style>
 
-    <!-- Unified Importmap: Essential to prevent "useState" errors -->
+    <!-- Importmap yang Bersih: Kunci sukses React ESM di Browser -->
     <script type="importmap">
 {
   "imports": {
@@ -54,16 +54,16 @@
 </script>
   </head>
   <body>
-    <!-- Loading Screen -->
+    <!-- Layar Loading Awal -->
     <div id="loading-screen">
       <div class="spinner"></div>
       <p style="margin-top: 16px; font-weight: 700; color: #64748b; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Menyiapkan Katalog...</p>
     </div>
 
-    <!-- Error Display -->
+    <!-- Tampilan Error (Muncul jika aplikasi crash) -->
     <div id="error-display">
       <h2 style="font-weight: 800; font-size: 20px; margin-bottom: 8px;">Gagal Memuat Aplikasi</h2>
-      <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8;">Jika layar tetap putih, coba muat ulang atau periksa koneksi internet Anda.</p>
+      <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8;">Klik tombol di bawah jika layar tetap putih lebih dari 10 detik.</p>
       <pre id="error-content" style="background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 11px; font-family: monospace; white-space: pre-wrap;"></pre>
       <button onclick="location.reload()" style="margin-top: 24px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Muat Ulang Halaman</button>
     </div>
@@ -71,33 +71,41 @@
     <div id="root"></div>
 
     <script>
+      // Fungsi untuk menutup loading screen
       window.hideLoading = function() {
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('fade-out');
       };
 
-      window.onerror = function(msg, url, line, col, error) {
-        if (msg.includes("ResizeObserver")) return; 
-        console.error("Global Error:", msg, "at", url, ":", line);
-        
+      // Handler Error Global
+      const reportError = (msg, source) => {
         const display = document.getElementById('error-display');
         const content = document.getElementById('error-content');
         if (display && content) {
           display.style.display = 'block';
-          content.textContent = `Pesan: ${msg}\nSumber: ${url || 'index.tsx'}\nBaris: ${line || '?'}`;
+          content.textContent = `Pesan: ${msg}\nSumber: ${source || 'Runtime'}`;
         }
         window.hideLoading();
+      };
+
+      window.onerror = function(msg, url, line) {
+        if (msg.includes("ResizeObserver")) return; 
+        reportError(msg, `${url}:${line}`);
         return false;
       };
 
-      // Safety hide after 10s to prevent stuck loading screen
+      window.addEventListener('unhandledrejection', function(event) {
+        reportError(event.reason?.message || "Promise Rejected", "Async Task");
+      });
+
+      // Timeout Pengaman: Jika aplikasi macet, paksa tutup loading screen setelah 7 detik
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
         if (ls && !ls.classList.contains('fade-out')) {
-          console.warn("Loading timeout reached");
+          console.warn("Loading timeout - App might be stuck.");
           window.hideLoading();
         }
-      }, 10000);
+      }, 7000);
     </script>
   </body>
 </html>
