@@ -39,7 +39,7 @@
       }
     </style>
 
-    <!-- Strict Importmap: Memastikan HANYA SATU instance React yang dimuat -->
+    <!-- Unified Importmap: Essential to prevent "useState" errors -->
     <script type="importmap">
 {
   "imports": {
@@ -54,52 +54,50 @@
 </script>
   </head>
   <body>
-    <!-- Layar Loading -->
+    <!-- Loading Screen -->
     <div id="loading-screen">
       <div class="spinner"></div>
       <p style="margin-top: 16px; font-weight: 700; color: #64748b; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Menyiapkan Katalog...</p>
     </div>
 
-    <!-- Tampilan Error -->
+    <!-- Error Display -->
     <div id="error-display">
       <h2 style="font-weight: 800; font-size: 20px; margin-bottom: 8px;">Gagal Memuat Aplikasi</h2>
-      <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8;">Terjadi kesalahan saat menginisialisasi modul belanja.</p>
-      <pre id="error-content" style="background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 12px; font-family: monospace; white-space: pre-wrap;"></pre>
+      <p style="font-size: 14px; margin-bottom: 16px; opacity: 0.8;">Jika layar tetap putih, coba muat ulang atau periksa koneksi internet Anda.</p>
+      <pre id="error-content" style="background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 11px; font-family: monospace; white-space: pre-wrap;"></pre>
       <button onclick="location.reload()" style="margin-top: 24px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Muat Ulang Halaman</button>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Fungsi global untuk menyembunyikan loading
       window.hideLoading = function() {
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('fade-out');
       };
 
-      // Pelaporan error yang lebih baik
       window.onerror = function(msg, url, line, col, error) {
         if (msg.includes("ResizeObserver")) return; 
-        console.error("Caught Error:", msg, url, line);
+        console.error("Global Error:", msg, "at", url, ":", line);
         
         const display = document.getElementById('error-display');
         const content = document.getElementById('error-content');
         if (display && content) {
           display.style.display = 'block';
-          content.textContent = `Pesan: ${msg}\nSumber: ${url || 'Module ESM'}\nBaris: ${line || '?'}`;
+          content.textContent = `Pesan: ${msg}\nSumber: ${url || 'index.tsx'}\nBaris: ${line || '?'}`;
         }
         window.hideLoading();
         return false;
       };
 
-      // Auto-hide loading jika aplikasi gagal memberi sinyal (safety net)
+      // Safety hide after 10s to prevent stuck loading screen
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
         if (ls && !ls.classList.contains('fade-out')) {
-          console.warn("Loading timeout - hiding screen");
+          console.warn("Loading timeout reached");
           window.hideLoading();
         }
-      }, 5000);
+      }, 10000);
     </script>
   </body>
 </html>
