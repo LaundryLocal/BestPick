@@ -9,14 +9,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Babel Standalone -->
+    <!-- Babel Standalone (Penting untuk menjalankan TSX di browser) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: { sans: ['Plus Jakarta Sans', sans-serif] },
+            fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
             colors: { shopee: '#EE4D2D' }
           }
         }
@@ -39,15 +39,16 @@
         display: none; position: fixed; inset: 0; background: #fff1f2;
         color: #be123c; padding: 20px; z-index: 10000; overflow: auto; font-family: monospace;
       }
+      .fade-out { opacity: 0; pointer-events: none; }
     </style>
 
     <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19",
-    "react-dom": "https://esm.sh/react-dom@19",
-    "react-dom/client": "https://esm.sh/react-dom@19/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0?external=react",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/"
   }
@@ -59,53 +60,51 @@
     <div id="loading-screen">
       <div class="spinner"></div>
       <p style="margin-top: 15px; font-weight: 800; color: #1e293b; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">Menyiapkan Katalog...</p>
+      <button id="fail-safe-btn" onclick="location.reload()" style="display: none; margin-top: 20px; font-size: 10px; color: #EE4D2D; text-decoration: underline;">Muat Ulang Halaman</button>
     </div>
 
     <!-- Tampilan Error -->
     <div id="error-display">
       <h2 style="font-weight: bold;">Oops! Aplikasi Gagal Dimuat</h2>
-      <p>Detail Error:</p>
-      <pre id="error-content"></pre>
-      <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">Segarkan Halaman</button>
+      <p>Ini biasanya terjadi karena masalah koneksi atau file tidak ditemukan.</p>
+      <pre id="error-content" style="background: #fee2e2; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 12px;"></pre>
+      <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: #be123c; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">Coba Lagi</button>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Logging error untuk HP
+      // Fungsi untuk menyembunyikan loading screen
+      window.hideLoading = function() {
+        const ls = document.getElementById('loading-screen');
+        if (ls) {
+          ls.classList.add('fade-out');
+          setTimeout(() => ls.style.display = 'none', 500);
+        }
+      };
+
+      // Fail-safe: Jika dalam 8 detik tidak masuk ke App, tampilkan tombol muat ulang
+      setTimeout(() => {
+        const ls = document.getElementById('loading-screen');
+        if (ls && ls.style.display !== 'none') {
+          document.getElementById('fail-safe-btn').style.display = 'block';
+        }
+      }, 8000);
+
+      // Logging error global
       window.onerror = function(msg, url, line, col, error) {
-        console.error(error);
-        const loading = document.getElementById('loading-screen');
-        if (loading) loading.style.display = 'none';
-        
+        console.error("Global Error:", msg, "at", url, ":", line);
         const display = document.getElementById('error-display');
-        display.style.display = 'block';
-        document.getElementById('error-content').textContent = `${msg}\nFile: ${url}\nLine: ${line}`;
+        if (display) {
+          display.style.display = 'block';
+          document.getElementById('error-content').textContent = `${msg}\nFile: ${url}\nLine: ${line}`;
+        }
+        window.hideLoading();
         return false;
       };
     </script>
 
-    <!-- Mount React secara langsung -->
-    <script type="text/babel" data-type="module">
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import App from './App.tsx';
-
-      try {
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-        
-        // Sembunyikan loading setelah render
-        setTimeout(() => {
-          const ls = document.getElementById('loading-screen');
-          if (ls) {
-            ls.style.opacity = '0';
-            setTimeout(() => ls.style.display = 'none', 500);
-          }
-        }, 800);
-      } catch (err) {
-        window.onerror(err.message, 'internal', 0, 0, err);
-      }
-    </script>
+    <!-- Menggunakan index.tsx sebagai entry point tunggal melalui Babel -->
+    <script type="text/babel" data-type="module" src="./index.tsx"></script>
   </body>
 </html>
