@@ -2,11 +2,11 @@ import React from 'react';
 
 export interface StoredAsset {
   id: string;
-  dataUrl: string; // Base64
+  dataUrl: string; 
   name: string;
   price: string;
-  description?: string; // New: Full product description
-  shopeeLink?: string; // Custom link per item
+  description?: string; // Detail lengkap produk
+  shopeeLink?: string; 
   type: 'image' | 'video';
   timestamp: number;
 }
